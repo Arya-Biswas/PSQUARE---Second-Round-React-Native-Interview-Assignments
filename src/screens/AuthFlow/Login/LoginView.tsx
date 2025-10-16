@@ -2,20 +2,65 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Keyboard, StyleSheet, View, Animated, Easing } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { AuthHeader, Button, Input, ShowToast, Text, Touchable } from '../../../components';
-import { navigate, replace } from '../../../navigation';
+import { navigate, navigationRef, replace } from '../../../navigation';
 import AuthLayout from '../../../app/context/AuthLayout';
 import { ICON_NAMES } from '../../../helpers/constants/icons';
 import { IsValidEmail, isValidPassword } from '../../../utils/validations';
 import { colors, fonts } from '../../../helpers/constants/styles';
 import { moderateScale } from 'react-native-size-matters';
+import auth from '@react-native-firebase/auth';
+import { addKeyToStorage } from '../../../utils/AsyncStorage';
+import { STORAGE_KEYS } from '../../../utils/storage';
+import { CommonActions } from '@react-navigation/native';
+
 
 export const LoginView = () => {
+
   const [email, setEmail] = useState( '');
   const [password, setPassword] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [keyboardOpen, setKeyboardOpen] = useState(false);
-
   const slideAnim = useRef(new Animated.Value(-300)).current;
+  const handleSignIn = async () => {
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) return;
+  
+    try {
+      const userCredential = await auth().signInWithEmailAndPassword(email.trim(), password);
+      const user = userCredential.user;
+     const idToken = await user.getIdToken();
+      await addKeyToStorage(STORAGE_KEYS.token,idToken);
+      ShowToast('Login successful');
+      navigationRef.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: 'BottomFlow', params: { screen: 'HomeScreen' } }],
+        })
+      );
+
+
+    } catch (error: any) {
+
+      switch (error.code) {
+        case 'auth/invalid-email':
+          ShowToast('Invalid email format');
+          break;
+        case 'auth/user-not-found':
+          ShowToast('No account found with this email');
+          break;
+        case 'auth/wrong-password':
+          ShowToast('Incorrect password');
+          break;
+        case 'auth/invalid-credential':
+          ShowToast('Login failed: Invalid or expired credential');
+          break;
+        default:
+          ShowToast('Login failed. Please try again.');
+      }
+    }
+    
+  };
+ 
 
   useEffect(() => {
     const showSub = Keyboard.addListener('keyboardDidShow', () => setKeyboardOpen(true));
@@ -48,12 +93,7 @@ export const LoginView = () => {
     return errors;
   };
 
-  const handleSignIn = () => {
-    const errors = validateForm();
-    if (Object.keys(errors).length > 0) return;
-    ShowToast('Login successful');
-    replace('BottomFlow', { screen: 'HomeScreen' });
-  };
+ 
 
   return (
     <AuthLayout>

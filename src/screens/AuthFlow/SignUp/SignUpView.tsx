@@ -8,6 +8,7 @@ import { colors, fonts } from '../../../helpers/constants/styles';
 import { moderateScale } from 'react-native-size-matters';
 import { IsValidEmail, isValidPassword } from '../../../utils/validations';
 import { SignUpErrors } from '../../../utils/errorMessages';
+import auth from '@react-native-firebase/auth';
 
 export const SignUpView = () => {
   const [firstName, setFirstName] = useState('');
@@ -46,14 +47,43 @@ export const SignUpView = () => {
     return errors;
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     const errors = validateForm();
     if (Object.keys(errors).length > 0) return;
+  
+    try {
 
-    ShowToast('Signup successful!');
-    navigate('OtpVerification', { data: { email } });
+      const userCredential = await auth().createUserWithEmailAndPassword(email.trim(), password);
+  
+
+      await userCredential.user.updateProfile({
+        displayName: `${firstName} ${lastName}`,
+      });
+  
+
+      await userCredential.user.sendEmailVerification();
+  
+
+      ShowToast('Signup successful! Please verify your email.');
+  
+
+      navigate('OtpVerification', { data: { email } });
+  
+    } catch (error: any) {
+
+      if (error.code === 'auth/email-already-in-use') {
+        ShowToast('Email already in use.');
+      } else if (error.code === 'auth/invalid-email') {
+        ShowToast('Invalid email format.');
+      } else if (error.code === 'auth/weak-password') {
+        ShowToast('Password should be at least 6 characters.');
+      } else {
+        ShowToast('Signup failed. Please try again.');
+      }
+    }
   };
-
+  
+  
   return (
     <AuthLayout>
       <KeyboardAwareScrollView

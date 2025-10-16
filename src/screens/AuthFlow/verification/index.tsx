@@ -19,16 +19,7 @@ const OtpVerification = (props: any) => {
       handleOtpSubmit();
     }
   }, [otp]);
-
-  const saveUserData = async (userData: any) => {
-    try {
-      await AsyncStorage.setItem('userData', JSON.stringify(userData));
-
-    } catch (error) {
-
-    }
-  };
-
+ 
   const handleOtpSubmit = async () => {
     if (otp.length === 6) {
       setLoading(true);

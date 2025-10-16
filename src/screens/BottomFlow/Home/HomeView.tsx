@@ -1,14 +1,28 @@
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { colors, fonts, screenWidth } from '../../../helpers/constants/styles';
 import FastImage from '@d11/react-native-fast-image';
 import { ICON_NAMES } from '../../../helpers/constants/icons';
 import { moderateScale } from 'react-native-size-matters';
-import { HomeHeaderGrid, Text, Touchable } from '../../../components';
+import { HomeHeaderGrid, LogoutModal, Text, Touchable } from '../../../components';
 import Doctor from './components/Doctor';
 import Vitamin from './components/Vitamin';
+import { removeKeyFromStorage } from '../../../utils/AsyncStorage';
+import { STORAGE_KEYS } from '../../../utils/storage';
+import { navigate, replace } from '../../../navigation';
 
 const HomeView = () => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const handleLogout = async () => {
+    await removeKeyFromStorage(STORAGE_KEYS.token);
+    setModalVisible(false);
+    setTimeout(() => {
+   replace("AuthFlow",{screen:"Login"})
+ 
+    }, 500);
+  };
+  
+  
   return (
     <KeyboardAvoidingView
       keyboardVerticalOffset={Platform.OS === 'ios' ? 70 : 0}
@@ -25,6 +39,11 @@ const HomeView = () => {
             <View style={styles.header1}>
               <FastImage source={ICON_NAMES.burgerBar} resizeMode="contain" style={styles.burgerBar} />
               <FastImage source={ICON_NAMES.healthy} resizeMode="contain" style={styles.healthy} />
+              <Touchable onPress={()=>{setModalVisible(true)}}>
+              <FastImage source={ICON_NAMES.logout} resizeMode="contain" style={styles.healthy} />
+              </Touchable>
+
+
             </View>
 
             <View style={styles.micContainer}>
@@ -62,6 +81,11 @@ const HomeView = () => {
 
           <View style={{ height: moderateScale(200) }} />
         </View>
+        <LogoutModal
+        visible={modalVisible}
+        onConfirm={handleLogout}
+        onCancel={() => setModalVisible(false)}
+      />
       </ScrollView>
     </KeyboardAvoidingView>
   );

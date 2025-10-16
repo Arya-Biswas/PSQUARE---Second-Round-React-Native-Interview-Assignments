@@ -26,7 +26,7 @@ export const ICON_NAMES = {
   back: require('../../assets/icons/back.png'),
   location: require('../../assets/icons/location.gif'),
   star: require('../../assets/icons/star.png'),
-
+  logout: require('../../assets/icons/logout.png'),
   baseWave1: require('../../assets/icons/baseWave1.png'),
   baseWave2: require('../../assets/icons/baseWave2.png'),
 

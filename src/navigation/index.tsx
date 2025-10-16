@@ -1,17 +1,18 @@
-// navigation/AppNavigation.tsx
-import React, {useEffect, useState} from 'react';
-import {Alert, BackHandler, ActivityIndicator, View} from 'react-native';
+
+import React, { useEffect, useState } from 'react';
+import { Alert, BackHandler, ActivityIndicator, View, Platform } from 'react-native';
 import {
   NavigationContainer,
   createNavigationContainerRef,
   StackActions,
 } from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-
-import {AuthStack} from './AuthStack';
-import {colors} from '../helpers/constants/styles';
+import { AuthStack } from './AuthStack';
 import { BottomStack } from './BottomStack';
+import { colors } from '../helpers/constants/styles';
+import { getKeyFromStorage } from '../utils/AsyncStorage';
+import { STORAGE_KEYS } from '../utils/storage';
 
 export const navigationRef = createNavigationContainerRef();
 
@@ -22,8 +23,8 @@ const handleBackButtonClick = () => {
       'Hold on!',
       'Are you sure you want to exit the application?',
       [
-        {text: 'Cancel', style: 'cancel'},
-        {text: 'Yes', onPress: () => BackHandler.exitApp()},
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Yes', onPress: () => BackHandler.exitApp() },
       ],
     );
     return true;
@@ -31,7 +32,7 @@ const handleBackButtonClick = () => {
   return false;
 };
 
-
+// Navigation helpers
 export function navigate(name: string, params?: any) {
   if (navigationRef.isReady()) {
     navigationRef.navigate(name as never, params as never);
@@ -51,36 +52,45 @@ export function goBack() {
   }
 }
 
-
 const RootStack = createNativeStackNavigator();
 
 export const AppNavigation = () => {
   const [initialRoute, setInitialRoute] = useState<string | null>(null);
 
-  useEffect(() => {
 
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      handleBackButtonClick,
-    );
-    return () => backHandler.remove();
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        handleBackButtonClick,
+      );
+      return () => backHandler.remove();
+    }
   }, []);
+
 
   useEffect(() => {
     const determineInitialRoute = async () => {
-      try {   
-        setInitialRoute('SplashScreen');  
+      try {
+        const token = await getKeyFromStorage(STORAGE_KEYS.token);
+
+        if (token) {
+          setInitialRoute('BottomFlow');  
+        } else {
+          setInitialRoute('AuthFlow'); 
+        }
       } catch (err) {
-        setInitialRoute('SplashScreen');
+        setInitialRoute('AuthFlow');
       }
     };
 
     determineInitialRoute();
   }, []);
 
+
   if (!initialRoute) {
     return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
@@ -89,17 +99,18 @@ export const AppNavigation = () => {
   return (
     <NavigationContainer ref={navigationRef}>
       <RootStack.Navigator
-        initialRouteName="AuthFlow"
+        initialRouteName={initialRoute}
         screenOptions={{
           headerShown: false,
           animation: 'slide_from_right',
-          contentStyle: {backgroundColor: colors.bg},
-        }}>
+          contentStyle: { backgroundColor: colors.bg },
+        }}
+      >
         <RootStack.Screen
           name="AuthFlow"
-          children={() => <AuthStack initialRoute={initialRoute} />}
+          children={() => <AuthStack initialRoute="SplashScreen" />}
         />
-             <RootStack.Screen name="BottomFlow" component={BottomStack} />
+        <RootStack.Screen name="BottomFlow" component={BottomStack} />
       </RootStack.Navigator>
     </NavigationContainer>
   );

@@ -9,6 +9,7 @@ import Loader from './Loader';
 import BottomBar from './BottomBar';
 import HomeHeaderGrid from './HomeHeaderGrid';
 import Header from './Header';
+import LogoutModal from './LogoutModal';
 export {
   Text,
   Touchable,
@@ -20,5 +21,6 @@ export {
   Loader,
   BottomBar,
   HomeHeaderGrid,
-  Header
+  Header,
+  LogoutModal
 };
