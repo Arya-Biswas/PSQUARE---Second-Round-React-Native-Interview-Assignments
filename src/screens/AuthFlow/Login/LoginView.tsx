@@ -10,8 +10,8 @@ import { colors, fonts } from '../../../helpers/constants/styles';
 import { moderateScale } from 'react-native-size-matters';
 
 export const LoginView = () => {
-  const [email, setEmail] = useState(__DEV__ ? 'aryalong5@gmail.com' : '');
-  const [password, setPassword] = useState(__DEV__ ? 'Arya@2001' : '');
+  const [email, setEmail] = useState( '');
+  const [password, setPassword] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [keyboardOpen, setKeyboardOpen] = useState(false);
 
