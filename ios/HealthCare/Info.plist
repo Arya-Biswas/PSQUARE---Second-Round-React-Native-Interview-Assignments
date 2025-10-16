@@ -32,16 +32,15 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<string></string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
+	<string>BootSplash</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-<string>Allow access to your photo library to upload prescription files</string>
-<key>NSCameraUsageDescription</key>
-<string>Allow access to your camera to take photos for prescription upload</string>
-
+	<string>Allow access to your photo library to upload prescription files</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Allow access to your camera to take photos for prescription upload</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>arm64</string>
