@@ -64,7 +64,7 @@ export const SignUpView = () => {
       await userCredential.user.sendEmailVerification();
   
 
-      ShowToast('Signup successful! Please verify your email.');
+      ShowToast('Please check your email and verify');
   
 
       navigate('OtpVerification', { data: { email } });

@@ -14,6 +14,7 @@ import { moderateScale } from 'react-native-size-matters';
 import FastImage from '@d11/react-native-fast-image';
 import { getKeyFromStorage } from '../../../utils/AsyncStorage';
 import { STORAGE_KEYS } from '../../../utils/storage';
+import { ICON_NAMES } from '../../../helpers/constants/icons';
 
 interface PrescriptionData {
   file: string;
@@ -83,7 +84,7 @@ const ReminderView = () => {
         keyExtractor={(_, index) => index.toString()}
         renderItem={renderItem}
         ListEmptyComponent={
-          <Text customStyle={styles.empty}>No prescriptions yet.</Text>
+         <FastImage source={ICON_NAMES.noData} resizeMode='contain' style={styles.nodata}/>
         }
       />
       <Modal visible={modalVisible} transparent={true} animationType="fade">
@@ -108,6 +109,11 @@ const ReminderView = () => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.white, paddingHorizontal: moderateScale(15) },
   listContent: { marginTop: moderateScale(20), paddingBottom: 100 },
+  nodata:{
+  height:moderateScale(100),
+  width:"70%",
+  alignSelf:"center"
+  },
   card: {
     marginBottom: moderateScale(20),
     borderWidth: 1,
@@ -158,6 +164,7 @@ const styles = StyleSheet.create({
     color: colors.lightBlack,
     marginTop: moderateScale(50),
     fontSize: moderateScale(14),
+    alignSelf:"center"
   },
   modalContainer: {
     flex: 1,
